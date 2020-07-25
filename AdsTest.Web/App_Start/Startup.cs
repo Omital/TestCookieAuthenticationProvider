@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNet.Identity.Owin;
 using System.Configuration;
 using Abp.Owin;
 using AdsTest.Api.Controllers;
@@ -7,6 +8,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
+using AdsTest.Authorization.Users;
 
 [assembly: OwinStartup(typeof(Startup))]
 
@@ -26,7 +28,13 @@ namespace AdsTest.Web
                 LoginPath = new PathString("/Account/Login"),
                 // evaluate for Persistent cookies (IsPermanent == true). Defaults to 14 days when not set.
                 ExpireTimeSpan = new TimeSpan(int.Parse(ConfigurationManager.AppSettings["AuthSession.ExpireTimeInDays.WhenPersistent"] ?? "14"), 0, 0, 0),
-                SlidingExpiration = bool.Parse(ConfigurationManager.AppSettings["AuthSession.SlidingExpirationEnabled"] ?? bool.FalseString)
+                SlidingExpiration = bool.Parse(ConfigurationManager.AppSettings["AuthSession.SlidingExpirationEnabled"] ?? bool.FalseString),
+                Provider = new CookieAuthenticationProvider
+                {
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<UserManager, User>(
+                    validateInterval: TimeSpan.FromMinutes(15),
+                    regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager)),
+                },
             });
 
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
