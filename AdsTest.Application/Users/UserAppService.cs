@@ -24,6 +24,8 @@ namespace AdsTest.Users
         private readonly RoleManager _roleManager;
         private readonly IRepository<Role> _roleRepository;
 
+            public AdsSession AdsSession { get; set; }
+
         public UserAppService(
             IRepository<User, long> repository,
             UserManager userManager,
@@ -38,6 +40,9 @@ namespace AdsTest.Users
 
         public override async Task<UserDto> GetAsync(EntityDto<long> input)
         {
+
+            var data = AdsSession.SubsystemId;
+
             var user = await base.GetAsync(input);
             var userRoles = await _userManager.GetRolesAsync(user.Id);
             user.Roles = userRoles.Select(ur => ur).ToArray();

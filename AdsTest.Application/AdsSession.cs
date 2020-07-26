@@ -17,14 +17,14 @@ namespace AdsTest
                     return null;
                 }
 
-
-                var emailClaim = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "SubsystemId");
-                if (emailClaim == null || string.IsNullOrEmpty(emailClaim.Value))
+                //problem is here, clm is always null
+                var clm = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "SubsystemId");
+                if (clm == null || string.IsNullOrEmpty(clm.Value))
                 {
                     return null;
                 }
 
-                return emailClaim.Value;
+                return clm.Value;
             }
         }
 
