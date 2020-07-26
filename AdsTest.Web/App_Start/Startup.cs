@@ -9,6 +9,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 using AdsTest.Authorization.Users;
+using Abp.Runtime.Security;
+using Abp.Dependency;
 
 [assembly: OwinStartup(typeof(Startup))]
 
@@ -22,6 +24,8 @@ namespace AdsTest.Web
 
             app.UseOAuthBearerAuthentication(AccountController.OAuthBearerOptions);
 
+            app.CreatePerOwinContext(IocManager.Instance.Resolve<UserManager>);
+
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
@@ -31,9 +35,10 @@ namespace AdsTest.Web
                 SlidingExpiration = bool.Parse(ConfigurationManager.AppSettings["AuthSession.SlidingExpirationEnabled"] ?? bool.FalseString),
                 Provider = new CookieAuthenticationProvider
                 {
-                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<UserManager, User>(
-                    validateInterval: TimeSpan.FromMinutes(15),
-                    regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager)),
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<UserManager, User, long>(
+                    validateInterval: TimeSpan.FromMinutes(0),
+                    regenerateIdentityCallback: (manager, user) => manager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie),
+                    getUserIdCallback: claimsIdentity => ClaimsIdentityExtensions.GetUserId(claimsIdentity).Value)
                 },
             });
 
