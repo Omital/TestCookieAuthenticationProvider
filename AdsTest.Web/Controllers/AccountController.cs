@@ -111,6 +111,9 @@ namespace AdsTest.Web.Controllers
 
             await SignInAsync(loginResult.User, loginResult.Identity, loginModel.RememberMe);
 
+            loginResult.Identity.AddClaim(new Claim("SubsystemId", "test"));
+
+
             if (string.IsNullOrWhiteSpace(returnUrl))
             {
                 returnUrl = Request.ApplicationPath;
