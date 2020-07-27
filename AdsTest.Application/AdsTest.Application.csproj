@@ -219,7 +219,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdsSession.cs" />
     <Compile Include="AdsTestApplicationModule.cs" />
     <Compile Include="AdsTestAppServiceBase.cs" />
     <Compile Include="Authorization\Accounts\AccountAppService.cs" />
